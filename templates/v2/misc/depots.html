@@ -9,7 +9,14 @@
 <div class="pi">
   <div class="ph au">
     <div class="ph-left"><div class="ph-title">Dépôts de stockage</div><div class="ph-sub">{{ depots|length }} dépôt{% if depots|length != 1 %}s{% endif %} et bureau{% if depots|length != 1 %}x{% endif %}</div></div>
-    <div class="ph-right"></div>
+    <div class="ph-right">
+      {% if is_chef_service or is_superadmin %}
+      <a href="{% url 'frontend:depot_create' %}" class="btn btn-p">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="12" height="12"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Nouveau dépôt/bureau
+      </a>
+      {% endif %}
+    </div>
   </div>
 
   <div class="g3 au d1">
@@ -32,6 +39,12 @@
       <div class="ref-card-info" style="margin-top:3px"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="11" height="11"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>{{ depot.service }}</div>
       {% endif %}
       {% if not depot.actif %}<span class="ref-badge-off" style="margin-top:8px;display:inline-flex">Inactif</span>{% endif %}
+      {% if is_chef_service or is_superadmin %}
+      <div class="ref-card-actions">
+        <a href="{% url 'frontend:depot_edit' depot.pk %}" class="ref-action-btn">Modifier</a>
+        <a href="{% url 'frontend:depot_delete' depot.pk %}" class="ref-action-btn ref-action-del">Supprimer</a>
+      </div>
+      {% endif %}
     </div>
     {% empty %}
     <div style="grid-column:1/-1"><div class="empty-state"><div class="empty-state-text">Aucun dépôt configuré</div></div></div>
@@ -50,5 +63,9 @@
 .ref-card-info{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--t3)}
 .ref-type-pill{font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:var(--surface3);color:var(--t2);text-transform:uppercase;letter-spacing:.04em}
 .ref-badge-off{display:inline-flex;align-items:center;padding:1px 7px;border-radius:10px;font-size:9.5px;font-weight:700;background:var(--red-d);color:var(--red);border:1px solid rgba(248,113,113,.25)}
+.ref-card-actions{display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.ref-action-btn{font-size:10px;font-weight:600;padding:3px 9px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);color:var(--t2);text-decoration:none;transition:all .14s}
+.ref-action-btn:hover{border-color:var(--accent);color:var(--accent)}
+.ref-action-del:hover{border-color:var(--red);color:var(--red)}
 </style>
 {% endblock %}

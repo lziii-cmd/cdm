@@ -28,7 +28,8 @@ class SuperadminRequiredMixin:
     """Restreint la vue au Super Administrateur uniquement."""
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return redirect('/admin/login/')
+            from urllib.parse import urlencode
+            return redirect(f"/app/login/?{urlencode({'next': request.get_full_path()})}")
         if not is_superadmin(request.user):
             messages.error(request, "Cette section est réservée au Super Administrateur.")
             return redirect('frontend:dashboard')

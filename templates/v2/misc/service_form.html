@@ -1,0 +1,70 @@
+{% extends 'v2/base.html' %}
+{% block page_title %}{% if instance %}Modifier service{% else %}Nouveau service{% endif %} — ENSMG{% endblock %}
+{% block page_title_short %}{% if instance %}Modifier service{% else %}Nouveau service{% endif %}{% endblock %}
+{% block breadcrumb %}
+<a href="{% url 'frontend:dashboard' %}">Accueil</a><span class="bread-sep">›</span>
+<a href="{% url 'frontend:services' %}">Services</a><span class="bread-sep">›</span>
+<span class="bread-cur">{% if instance %}Modifier{% else %}Nouveau{% endif %}</span>
+{% endblock %}
+
+{% block content %}
+<div class="pi">
+  <div class="ph au">
+    <div class="ph-left">
+      <div class="ph-title">{% if instance %}Modifier le service{% else %}Nouveau service{% endif %}</div>
+      <div class="ph-sub">Structure organisationnelle interne</div>
+    </div>
+  </div>
+
+  {% if messages %}
+  <div class="au d1" style="display:flex;flex-direction:column;gap:6px">
+    {% for msg in messages %}
+    <div style="padding:10px 14px;border-radius:var(--rs);font-size:12px;font-weight:600;
+      {% if msg.tags == 'error' %}background:var(--red-d);color:var(--red);border:1px solid rgba(248,113,113,.25)
+      {% else %}background:var(--green-d);color:var(--green);border:1px solid rgba(74,222,154,.25){% endif %}">{{ msg }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="card au d2" style="max-width:520px">
+    <div class="cb">
+      <form method="post">
+        {% csrf_token %}
+        <div style="display:grid;grid-template-columns:1fr 2fr;gap:14px">
+          <div class="fld">
+            <label>Code <span style="color:var(--red)">*</span></label>
+            <input type="text" name="code" value="{% if instance %}{{ instance.code }}{% endif %}" placeholder="DIR" required style="text-transform:uppercase">
+          </div>
+          <div class="fld">
+            <label>Libellé <span style="color:var(--red)">*</span></label>
+            <input type="text" name="libelle" value="{% if instance %}{{ instance.libelle }}{% endif %}" required>
+          </div>
+          <div class="fld" style="grid-column:1/-1">
+            <label>Responsable <span style="color:var(--red)">*</span></label>
+            <input type="text" name="responsable" value="{% if instance %}{{ instance.responsable }}{% endif %}" placeholder="Nom et prénom du responsable" required>
+          </div>
+          {% if instance %}
+          <div class="fld" style="grid-column:1/-1;display:flex;align-items:center;gap:8px">
+            <input type="checkbox" name="actif" id="id_actif" {% if instance.actif %}checked{% endif %} style="width:auto;margin:0">
+            <label for="id_actif" style="margin:0;text-transform:none;font-size:13px;font-weight:500;color:var(--t1)">Service actif</label>
+          </div>
+          {% endif %}
+        </div>
+        <div style="display:flex;gap:8px;margin-top:14px">
+          <button type="submit" class="btn btn-p">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="12" height="12"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            {% if instance %}Enregistrer{% else %}Créer{% endif %}
+          </button>
+          <a href="{% url 'frontend:services' %}" class="btn btn-s">Annuler</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<style>
+.fld{margin-bottom:0}.fld label{display:block;font-size:11px;font-weight:600;color:var(--t2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.3px}
+.fld input,.fld select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:9px 12px;font-family:var(--font);font-size:13px;color:var(--t1);outline:none;transition:border-color .15s}
+.fld input:focus,.fld select:focus{border-color:var(--border-focus)}
+.btn-s{background:var(--surface2);border:1px solid var(--border);color:var(--t2)}.btn-s:hover{border-color:var(--border-h);color:var(--t1)}
+</style>
+{% endblock %}

@@ -9,7 +9,14 @@
 <div class="pi">
   <div class="ph au">
     <div class="ph-left"><div class="ph-title">Fournisseurs</div><div class="ph-sub">Catalogue des fournisseurs</div></div>
-    <div class="ph-right"></div>
+    <div class="ph-right">
+      {% if is_chef_service or is_superadmin %}
+      <a href="{% url 'frontend:fournisseur_create' %}" class="btn btn-p">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="12" height="12"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Nouveau fournisseur
+      </a>
+      {% endif %}
+    </div>
   </div>
 
   <div class="card au d1" style="flex-shrink:0;padding:12px 16px">
@@ -34,6 +41,12 @@
       {% endif %}
       {% if f.email %}
       <div class="ref-card-info" style="margin-top:3px"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="11" height="11"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>{{ f.email }}</div>
+      {% endif %}
+      {% if is_chef_service or is_superadmin %}
+      <div class="ref-card-actions">
+        <a href="{% url 'frontend:fournisseur_edit' f.pk %}" class="ref-action-btn">Modifier</a>
+        <a href="{% url 'frontend:fournisseur_delete' f.pk %}" class="ref-action-btn ref-action-del">Supprimer</a>
+      </div>
       {% endif %}
     </div>
     {% empty %}
@@ -63,5 +76,9 @@
 .ref-card-name{font-size:13px;font-weight:700;color:var(--t1);margin-bottom:6px}
 .ref-card-info{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--t3)}
 .ref-nif{font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:8px;background:rgba(251,191,36,.1);color:var(--amber);border:1px solid rgba(251,191,36,.25)}
+.ref-card-actions{display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.ref-action-btn{font-size:10px;font-weight:600;padding:3px 9px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);color:var(--t2);text-decoration:none;transition:all .14s}
+.ref-action-btn:hover{border-color:var(--accent);color:var(--accent)}
+.ref-action-del:hover{border-color:var(--red);color:var(--red)}
 </style>
 {% endblock %}

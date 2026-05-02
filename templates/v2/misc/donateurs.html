@@ -9,7 +9,14 @@
 <div class="pi">
   <div class="ph au">
     <div class="ph-left"><div class="ph-title">Donateurs</div><div class="ph-sub">Personnes et organisations donatrices</div></div>
-    <div class="ph-right"></div>
+    <div class="ph-right">
+      {% if is_chef_service or is_superadmin %}
+      <a href="{% url 'frontend:donateur_create' %}" class="btn btn-p">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="12" height="12"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Nouveau donateur
+      </a>
+      {% endif %}
+    </div>
   </div>
 
   <div class="card au d1" style="flex-shrink:0;padding:12px 16px">
@@ -33,6 +40,12 @@
       {% elif d.adresse %}
       <div class="ref-card-info"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="11" height="11"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>{{ d.adresse }}</div>
       {% endif %}
+      {% if is_chef_service or is_superadmin %}
+      <div class="ref-card-actions">
+        <a href="{% url 'frontend:donateur_edit' d.pk %}" class="ref-action-btn">Modifier</a>
+        <a href="{% url 'frontend:donateur_delete' d.pk %}" class="ref-action-btn ref-action-del">Supprimer</a>
+      </div>
+      {% endif %}
     </div>
     {% empty %}
     <div style="grid-column:1/-1"><div class="empty-state"><div class="empty-state-text">Aucun donateur trouvé</div></div></div>
@@ -49,5 +62,9 @@
 .ref-card-name{font-size:13px;font-weight:700;color:var(--t1);margin-bottom:6px}
 .ref-card-info{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--t3)}
 .ref-don-count{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(167,139,250,.12);color:var(--purple);border:1px solid rgba(167,139,250,.25)}
+.ref-card-actions{display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.ref-action-btn{font-size:10px;font-weight:600;padding:3px 9px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);color:var(--t2);text-decoration:none;transition:all .14s}
+.ref-action-btn:hover{border-color:var(--accent);color:var(--accent)}
+.ref-action-del:hover{border-color:var(--red);color:var(--red)}
 </style>
 {% endblock %}

@@ -1,0 +1,97 @@
+{% extends 'v2/base.html' %}
+{% block page_title %}{% if instance %}Modifier dépôt/bureau{% else %}Nouveau dépôt/bureau{% endif %} — ENSMG{% endblock %}
+{% block page_title_short %}{% if instance %}Modifier dépôt{% else %}Nouveau dépôt{% endif %}{% endblock %}
+{% block breadcrumb %}
+<a href="{% url 'frontend:dashboard' %}">Accueil</a><span class="bread-sep">›</span>
+<a href="{% url 'frontend:depots' %}">Dépôts/Bureaux</a><span class="bread-sep">›</span>
+<span class="bread-cur">{% if instance %}Modifier{% else %}Nouveau{% endif %}</span>
+{% endblock %}
+
+{% block content %}
+<div class="pi">
+  <div class="ph au">
+    <div class="ph-left">
+      <div class="ph-title">{% if instance %}Modifier le dépôt/bureau{% else %}Nouveau dépôt/bureau{% endif %}</div>
+      <div class="ph-sub">Dépôt = magasin physique · Bureau = lieu d'affectation interne</div>
+    </div>
+  </div>
+
+  {% if messages %}
+  <div class="au d1" style="display:flex;flex-direction:column;gap:6px">
+    {% for msg in messages %}
+    <div style="padding:10px 14px;border-radius:var(--rs);font-size:12px;font-weight:600;
+      {% if msg.tags == 'error' %}background:var(--red-d);color:var(--red);border:1px solid rgba(248,113,113,.25)
+      {% else %}background:var(--green-d);color:var(--green);border:1px solid rgba(74,222,154,.25){% endif %}">{{ msg }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="card au d2" style="max-width:560px">
+    <div class="cb">
+      <form method="post">
+        {% csrf_token %}
+        <div style="display:grid;grid-template-columns:1fr 2fr;gap:14px">
+          <div class="fld">
+            <label>Identifiant <span style="color:var(--red)">*</span></label>
+            <input type="text" name="identifiant" value="{% if instance %}{{ instance.identifiant }}{% endif %}" placeholder="Ex: D01" {% if instance %}readonly style="opacity:.65"{% endif %} required>
+          </div>
+          <div class="fld">
+            <label>Nom <span style="color:var(--red)">*</span></label>
+            <input type="text" name="nom" value="{% if instance %}{{ instance.nom }}{% endif %}" required>
+          </div>
+          <div class="fld" style="grid-column:1/-1">
+            <label>Type de lieu</label>
+            <select name="type_lieu" id="typeLieu" onchange="toggleService()">
+              <option value="DEPOT" {% if not instance or instance.type_lieu == 'DEPOT' %}selected{% endif %}>Dépôt / Magasin</option>
+              <option value="BUREAU" {% if instance and instance.type_lieu == 'BUREAU' %}selected{% endif %}>Bureau / Service</option>
+            </select>
+          </div>
+          <div class="fld" style="grid-column:1/-1" id="serviceField">
+            <label>Service <span style="color:var(--red)">*</span></label>
+            <select name="service">
+              <option value="">— Sélectionner un service —</option>
+              {% for svc in services_list %}
+              <option value="{{ svc.pk }}" {% if instance and instance.service_id == svc.pk %}selected{% endif %}>{{ svc.code }} — {{ svc.libelle }}</option>
+              {% endfor %}
+            </select>
+            <div style="font-size:10px;color:var(--t3);margin-top:4px">Obligatoire pour un Bureau.</div>
+          </div>
+          <div class="fld" style="grid-column:1/-1">
+            <label>Localisation</label>
+            <input type="text" name="localisation" value="{% if instance %}{{ instance.localisation }}{% endif %}" placeholder="Bâtiment, étage, salle…">
+          </div>
+          {% if instance %}
+          <div class="fld" style="grid-column:1/-1;display:flex;align-items:center;gap:8px">
+            <input type="checkbox" name="actif" id="id_actif" {% if instance.actif %}checked{% endif %} style="width:auto;margin:0">
+            <label for="id_actif" style="margin:0;text-transform:none;font-size:13px;font-weight:500;color:var(--t1)">Lieu actif</label>
+          </div>
+          {% endif %}
+        </div>
+        <div style="display:flex;gap:8px;margin-top:14px">
+          <button type="submit" class="btn btn-p">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="12" height="12"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            {% if instance %}Enregistrer{% else %}Créer{% endif %}
+          </button>
+          <a href="{% url 'frontend:depots' %}" class="btn btn-s">Annuler</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<style>
+.fld{margin-bottom:0}.fld label{display:block;font-size:11px;font-weight:600;color:var(--t2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.3px}
+.fld input,.fld select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:9px 12px;font-family:var(--font);font-size:13px;color:var(--t1);outline:none;transition:border-color .15s}
+.fld input:focus,.fld select:focus{border-color:var(--border-focus)}
+.btn-s{background:var(--surface2);border:1px solid var(--border);color:var(--t2)}.btn-s:hover{border-color:var(--border-h);color:var(--t1)}
+</style>
+{% block extra_js %}
+<script>
+function toggleService(){
+  var t=document.getElementById('typeLieu').value;
+  var sf=document.getElementById('serviceField');
+  sf.style.display=(t==='BUREAU')?'block':'none';
+}
+toggleService();
+</script>
+{% endblock %}
+{% endblock %}

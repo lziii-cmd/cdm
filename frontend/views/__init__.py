@@ -26,9 +26,13 @@ from .stock import (
 )
 from .referentiels import (
     FournisseursListView,
+    FournisseurCreateView, FournisseurEditView, FournisseurDeleteView,
     DonateursListView,
+    DonateurCreateView, DonateurEditView, DonateurDeleteView,
     DepotsListView,
+    DepotCreateView, DepotEditView, DepotDeleteView,
     ServicesListView,
+    ServiceCreateView, ServiceEditView, ServiceDeleteView,
     UnitesListView,
 )
 from .system import (

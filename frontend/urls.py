@@ -51,9 +51,25 @@ urlpatterns = [
 
     # Référentiels
     path('fournisseurs/', views.FournisseursListView.as_view(), name='fournisseurs'),
+    path('fournisseurs/nouveau/', views.FournisseurCreateView.as_view(), name='fournisseur_create'),
+    path('fournisseurs/<int:pk>/modifier/', views.FournisseurEditView.as_view(), name='fournisseur_edit'),
+    path('fournisseurs/<int:pk>/supprimer/', views.FournisseurDeleteView.as_view(), name='fournisseur_delete'),
+
     path('donateurs/', views.DonateursListView.as_view(), name='donateurs'),
+    path('donateurs/nouveau/', views.DonateurCreateView.as_view(), name='donateur_create'),
+    path('donateurs/<int:pk>/modifier/', views.DonateurEditView.as_view(), name='donateur_edit'),
+    path('donateurs/<int:pk>/supprimer/', views.DonateurDeleteView.as_view(), name='donateur_delete'),
+
     path('depots/', views.DepotsListView.as_view(), name='depots'),
+    path('depots/nouveau/', views.DepotCreateView.as_view(), name='depot_create'),
+    path('depots/<int:pk>/modifier/', views.DepotEditView.as_view(), name='depot_edit'),
+    path('depots/<int:pk>/supprimer/', views.DepotDeleteView.as_view(), name='depot_delete'),
+
     path('services/', views.ServicesListView.as_view(), name='services'),
+    path('services/nouveau/', views.ServiceCreateView.as_view(), name='service_create'),
+    path('services/<int:pk>/modifier/', views.ServiceEditView.as_view(), name='service_edit'),
+    path('services/<int:pk>/supprimer/', views.ServiceDeleteView.as_view(), name='service_delete'),
+
     path('unites/', views.UnitesListView.as_view(), name='unites'),
 
     # Système
