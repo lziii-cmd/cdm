@@ -1,0 +1,97 @@
+{% extends 'v2/base.html' %}
+{% block page_title %}Nouveau prêt — ENSMG{% endblock %}
+{% block page_title_short %}Nouveau prêt{% endblock %}
+{% block breadcrumb %}
+<a href="{% url 'frontend:dashboard' %}">Accueil</a><span class="bread-sep">›</span>
+<a href="{% url 'frontend:prets' %}">Prêts</a><span class="bread-sep">›</span>
+<span class="bread-cur">Nouveau</span>
+{% endblock %}
+
+{% block content %}
+<div class="pi">
+  <div class="ph au">
+    <div class="ph-left"><div class="ph-title">Nouveau prêt</div><div class="ph-sub">Sortie temporaire de matières vers un service</div></div>
+    <div class="ph-right"><a href="{% url 'frontend:prets' %}" class="btn btn-o">← Annuler</a></div>
+  </div>
+
+  {% if messages %}
+  <div class="au d1">
+    {% for msg in messages %}
+    <div style="background:var(--red-d);border:1px solid rgba(248,113,113,.3);border-radius:var(--rs);padding:9px 14px;font-size:12px;color:var(--red);margin-bottom:6px">{{ msg }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+
+    <div class="card au d1" style="margin-bottom:14px">
+      <div class="ch"><div class="ch-ico o"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg></div><div><div class="ch-title">Informations générales</div></div></div>
+      <div class="cb">
+        <div class="fgrid">
+          <div class="field">
+            <label class="flbl">Service bénéficiaire <span class="req-dot"></span></label>
+            <select class="fi" name="service" required>
+              <option value="">— Sélectionner —</option>
+              {% for s in services %}<option value="{{ s.pk }}" {% if post_data.service == s.pk|stringformat:"s" %}selected{% endif %}>{{ s.libelle }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="field">
+            <label class="flbl">Date de prêt <span class="req-dot"></span></label>
+            <input class="fi" type="date" name="date_pret" value="{{ post_data.date_pret|default:today }}" required>
+          </div>
+          <div class="field">
+            <label class="flbl">Dépôt source <span class="req-dot"></span></label>
+            <select class="fi" name="depot" required>
+              <option value="">— Sélectionner —</option>
+              {% for d in depots %}<option value="{{ d.pk }}" {% if post_data.depot == d.pk|stringformat:"s" %}selected{% endif %}>{{ d.nom }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="field fs2">
+            <label class="flbl">Commentaire</label>
+            <textarea class="fi" name="commentaire" rows="2" placeholder="Observations…">{{ post_data.commentaire|default:'' }}</textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card au d2">
+      <div class="ch">
+        <div class="ch-ico g"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div>
+        <div><div class="ch-title">Lignes du prêt</div><div class="ch-sub">Matières prêtées (sans prix)</div></div>
+        <div class="ch-right">
+          <button type="button" class="btn btn-save btn-sm" id="addLigne">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="11" height="11"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Ajouter une ligne
+          </button>
+        </div>
+      </div>
+      <div class="tbl-scroll">
+        <table>
+          <thead><tr><th style="width:65%">Matière</th><th style="text-align:right;width:25%">Quantité</th><th style="width:10%"></th></tr></thead>
+          <tbody id="lignesBody">
+            <tr class="ligne-row">
+              <td><select class="fi" name="ligne_matiere" style="font-size:11px;padding:5px 8px">
+                <option value="">— Matière —</option>
+                {% for m in matieres %}<option value="{{ m.pk }}">{{ m.code_court }} — {{ m.designation }}</option>{% endfor %}
+              </select></td>
+              <td><input type="number" class="fi mono" name="ligne_quantite" step="0.001" min="0.001" placeholder="0.000" style="text-align:right;font-size:11px;padding:5px 8px"></td>
+              <td style="text-align:center"><button type="button" class="btn btn-danger btn-sm" onclick="removeLigne(this)" style="padding:3px 7px">✕</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="cf"><div></div>
+        <button type="submit" class="btn btn-p">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="13" height="13"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+          Enregistrer le prêt
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+<script>
+function removeLigne(btn){var tbody=document.getElementById('lignesBody');if(tbody.querySelectorAll('.ligne-row').length<=1)return;btn.closest('tr').remove();}
+document.getElementById('addLigne').addEventListener('click',function(){var tbody=document.getElementById('lignesBody');var first=tbody.querySelector('.ligne-row');var clone=first.cloneNode(true);clone.querySelectorAll('input').forEach(function(i){i.value='';});clone.querySelectorAll('select').forEach(function(s){s.selectedIndex=0;});tbody.appendChild(clone);});
+</script>
+{% endblock %}

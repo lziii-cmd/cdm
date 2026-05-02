@@ -1,0 +1,171 @@
+{% extends 'v2/base.html' %}
+{% block page_title %}Nouvel achat — ENSMG{% endblock %}
+{% block page_title_short %}Nouvel achat{% endblock %}
+{% block breadcrumb %}
+<a href="{% url 'frontend:dashboard' %}">Accueil</a><span class="bread-sep">›</span>
+<a href="{% url 'frontend:achats' %}">Achats</a><span class="bread-sep">›</span>
+<span class="bread-cur">Nouveau</span>
+{% endblock %}
+
+{% block content %}
+<div class="pi">
+  <div class="ph au">
+    <div class="ph-left"><div class="ph-title">Nouvel achat</div><div class="ph-sub">Saisissez l'en-tête puis les lignes de matières</div></div>
+    <div class="ph-right"><a href="{% url 'frontend:achats' %}" class="btn btn-o">← Annuler</a></div>
+  </div>
+
+  {% if messages %}
+  <div class="au d1">
+    {% for msg in messages %}
+    <div style="background:var(--red-d);border:1px solid rgba(248,113,113,.3);border-radius:var(--rs);padding:9px 14px;font-size:12px;color:var(--red);margin-bottom:6px">{{ msg }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {# ── EN-TÊTE ── #}
+    <div class="card au d1" style="margin-bottom:14px">
+      <div class="ch"><div class="ch-ico b"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div><div><div class="ch-title">Informations générales</div></div></div>
+      <div class="cb">
+        <div class="fgrid">
+          <div class="field">
+            <label class="flbl">Fournisseur <span class="req-dot"></span></label>
+            <select class="fi" name="fournisseur" required>
+              <option value="">— Sélectionner —</option>
+              {% for f in fournisseurs %}<option value="{{ f.pk }}" {% if post_data.fournisseur == f.pk|stringformat:"s" %}selected{% endif %}>{{ f.raison_sociale }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="field">
+            <label class="flbl">Date d'achat <span class="req-dot"></span></label>
+            <input class="fi" type="date" name="date_achat" value="{{ post_data.date_achat|default:today }}" required>
+          </div>
+          <div class="field">
+            <label class="flbl">Dépôt de réception</label>
+            <select class="fi" name="depot">
+              <option value="">— Aucun —</option>
+              {% for d in depots %}<option value="{{ d.pk }}" {% if post_data.depot == d.pk|stringformat:"s" %}selected{% endif %}>{{ d.nom }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="field">
+            <label class="flbl">N° Facture / Pièce</label>
+            <input class="fi" type="text" name="numero_facture" value="{{ post_data.numero_facture|default:'' }}" placeholder="Ex: FAC-2026-001">
+          </div>
+          <div class="field">
+            <label class="flbl" style="cursor:pointer;user-select:none">
+              <input type="checkbox" name="tva_active" {% if post_data.tva_active %}checked{% endif %} style="margin-right:6px;accent-color:var(--accent)">
+              TVA applicable (18 %)
+            </label>
+          </div>
+          <div class="field fs2">
+            <label class="flbl">Commentaire</label>
+            <textarea class="fi" name="commentaire" rows="2" placeholder="Observations…">{{ post_data.commentaire|default:'' }}</textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# ── LIGNES ── #}
+    <div class="card au d2">
+      <div class="ch">
+        <div class="ch-ico g"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/></svg></div>
+        <div><div class="ch-title">Lignes d'achat</div><div class="ch-sub">Matières commandées</div></div>
+        <div class="ch-right">
+          <button type="button" class="btn btn-save btn-sm" id="addLigne">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="11" height="11"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Ajouter une ligne
+          </button>
+        </div>
+      </div>
+      <div class="tbl-scroll">
+        <table id="lignesTable">
+          <thead><tr>
+            <th style="width:40%">Matière</th>
+            <th style="text-align:right;width:15%">Quantité</th>
+            <th style="text-align:right;width:18%">Prix unitaire HT</th>
+            <th style="text-align:right;width:18%">Total HT</th>
+            <th style="width:9%"></th>
+          </tr></thead>
+          <tbody id="lignesBody">
+            <tr class="ligne-row">
+              <td><select class="fi" name="ligne_matiere" style="font-size:11px;padding:5px 8px" onchange="calcLigne(this)">
+                <option value="">— Matière —</option>
+                {% for m in matieres %}<option value="{{ m.pk }}">{{ m.code_court }} — {{ m.designation }}</option>{% endfor %}
+              </select></td>
+              <td><input type="number" class="fi mono" name="ligne_quantite" step="0.001" min="0.001" placeholder="0.000" style="text-align:right;font-size:11px;padding:5px 8px" oninput="calcLigne(this)"></td>
+              <td><input type="number" class="fi mono" name="ligne_pu" step="0.01" min="0" placeholder="0.00" style="text-align:right;font-size:11px;padding:5px 8px" oninput="calcLigne(this)"></td>
+              <td class="mono ligne-total" style="text-align:right;color:var(--green)">—</td>
+              <td style="text-align:center"><button type="button" class="btn btn-danger btn-sm" onclick="removeLigne(this)" style="padding:3px 7px">✕</button></td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr style="background:var(--surface2)">
+              <td colspan="3" style="text-align:right;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t3);padding:8px 13px">TOTAL HT</td>
+              <td class="mono" id="totalHT" style="text-align:right;color:var(--green);font-weight:700;padding:8px 13px">0</td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      <div class="cf">
+        <div></div>
+        <button type="submit" class="btn btn-p">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="13" height="13"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+          Enregistrer l'achat
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+var matieres = [{% for m in matieres %}{"pk":"{{ m.pk }}","label":"{{ m.code_court|escapejs }} — {{ m.designation|escapejs }}"},{% endfor %}];
+
+function getRowTotal(row) {
+  var q = parseFloat(row.querySelector('[name=ligne_quantite]').value)||0;
+  var pu = parseFloat(row.querySelector('[name=ligne_pu]').value)||0;
+  return q*pu;
+}
+
+function calcLigne(el) {
+  var row = el.closest('tr');
+  var t = getRowTotal(row);
+  row.querySelector('.ligne-total').textContent = t>0 ? Math.round(t).toLocaleString('fr-FR')+' F' : '—';
+  updateTotal();
+}
+
+function updateTotal() {
+  var total = 0;
+  document.querySelectorAll('.ligne-row').forEach(function(row){
+    total += getRowTotal(row);
+  });
+  document.getElementById('totalHT').textContent = Math.round(total).toLocaleString('fr-FR')+' F CFA';
+}
+
+function cloneRow() {
+  var tbody = document.getElementById('lignesBody');
+  var first = tbody.querySelector('.ligne-row');
+  var clone = first.cloneNode(true);
+  clone.querySelectorAll('input').forEach(function(i){ i.value=''; });
+  clone.querySelectorAll('select').forEach(function(s){ s.selectedIndex=0; });
+  clone.querySelector('.ligne-total').textContent='—';
+  tbody.appendChild(clone);
+}
+
+function removeLigne(btn) {
+  var tbody = document.getElementById('lignesBody');
+  if (tbody.querySelectorAll('.ligne-row').length <= 1) return;
+  btn.closest('tr').remove();
+  updateTotal();
+}
+
+document.getElementById('addLigne').addEventListener('click', function(){
+  cloneRow();
+});
+
+document.getElementById('lignesBody').addEventListener('input', function(e){
+  if (e.target.matches('[name=ligne_quantite],[name=ligne_pu]')) calcLigne(e.target);
+});
+</script>
+{% endblock %}

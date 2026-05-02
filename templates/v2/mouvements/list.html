@@ -30,7 +30,7 @@
           {% for mv in mouvements %}
           <tr class="tr-click" onclick="location.href='{% url 'frontend:mouvement_detail' mv.pk %}'">
             <td>{{ mv.date_mouvement|date:"d/m/Y" }}</td>
-            <td><span class="badge-solid {% if mv.type_mouvement == 'ENTREE' %}bg{% elif mv.type_mouvement == 'SORTIE' %}amber{% else %}blue{% endif %}">{{ mv.get_type_mouvement_display|default:mv.type_mouvement }}</span></td>
+            <td><span class="badge-solid {% if mv.type == 'ENTREE' %}bg{% elif mv.type == 'SORTIE' %}amber{% else %}blue{% endif %}">{{ mv.get_type_display|default:mv.type }}</span></td>
             <td><span class="txt-a">{{ mv.matiere.code_court }}</span> — {{ mv.matiere.designation }}</td>
             <td>{{ mv.depot.code|default:"—" }}</td>
             <td class="mono" style="text-align:right">{{ mv.quantite }}</td>

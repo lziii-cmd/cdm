@@ -10,6 +10,10 @@
   <div class="ph au">
     <div class="ph-left"><div class="ph-title">Achats</div><div class="ph-sub">Liste et gestion des achats fournisseurs</div></div>
     <div class="ph-right">
+      <a href="{% url 'frontend:achat_create' %}" class="btn btn-p">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="12" height="12"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Nouvel achat
+      </a>
       <button class="btn btn-o" onclick="window.print()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>Exporter</button>
     </div>
   </div>

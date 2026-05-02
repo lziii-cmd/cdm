@@ -55,3 +55,9 @@ from .users import (
     UserEditView,
     UserDeleteView,
 )
+from .create_views import (
+    AchatCreateView,
+    DonCreateView,
+    LegsCreateView,
+    PretCreateView,
+)

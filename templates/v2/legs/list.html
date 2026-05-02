@@ -9,7 +9,12 @@
 <div class="pi">
   <div class="ph au">
     <div class="ph-left"><div class="ph-title">Legs</div><div class="ph-sub">Entrées par legs / héritage</div></div>
-    <div class="ph-right"></div>
+    <div class="ph-right">
+      <a href="{% url 'frontend:legs_create' %}" class="btn btn-p">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="12" height="12"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Nouveau legs
+      </a>
+    </div>
   </div>
 
   <div class="card au d1" style="flex:1;display:flex;flex-direction:column">

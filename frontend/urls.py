@@ -24,17 +24,21 @@ urlpatterns = [
 
     # Achats
     path('achats/', views.AchatsListView.as_view(), name='achats'),
+    path('achats/nouveau/', views.AchatCreateView.as_view(), name='achat_create'),
     path('achats/<int:pk>/', views.AchatDetailView.as_view(), name='achat_detail'),
 
     # Entrées
     path('dons/', views.DonsListView.as_view(), name='dons'),
+    path('dons/nouveau/', views.DonCreateView.as_view(), name='don_create'),
     path('dons/<int:pk>/', views.DonDetailView.as_view(), name='don_detail'),
     path('legs/', views.LegsListView.as_view(), name='legs'),
+    path('legs/nouveau/', views.LegsCreateView.as_view(), name='legs_create'),
     path('legs/<int:pk>/', views.LegsDetailView.as_view(), name='legs_detail'),
     path('dotations/', views.DotationsListView.as_view(), name='dotations'),
 
     # Prêts
     path('prets/', views.PretsListView.as_view(), name='prets'),
+    path('prets/nouveau/', views.PretCreateView.as_view(), name='pret_create'),
     path('prets/<int:pk>/', views.PretDetailView.as_view(), name='pret_detail'),
     path('prets/retours/<int:pk>/', views.RetourPretDetailView.as_view(), name='retour_pret_detail'),
     path('retours-fournisseurs/', views.RetoursFournisseursListView.as_view(), name='retours_fournisseurs'),

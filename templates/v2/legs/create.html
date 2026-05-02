@@ -1,0 +1,112 @@
+{% extends 'v2/base.html' %}
+{% block page_title %}Nouveau legs — ENSMG{% endblock %}
+{% block page_title_short %}Nouveau legs{% endblock %}
+{% block breadcrumb %}
+<a href="{% url 'frontend:dashboard' %}">Accueil</a><span class="bread-sep">›</span>
+<a href="{% url 'frontend:legs' %}">Legs</a><span class="bread-sep">›</span>
+<span class="bread-cur">Nouveau</span>
+{% endblock %}
+
+{% block content %}
+<div class="pi">
+  <div class="ph au">
+    <div class="ph-left"><div class="ph-title">Nouveau legs</div><div class="ph-sub">Entrée de matières par voie de legs / héritage</div></div>
+    <div class="ph-right"><a href="{% url 'frontend:legs' %}" class="btn btn-o">← Annuler</a></div>
+  </div>
+
+  {% if messages %}
+  <div class="au d1">
+    {% for msg in messages %}
+    <div style="background:var(--red-d);border:1px solid rgba(248,113,113,.3);border-radius:var(--rs);padding:9px 14px;font-size:12px;color:var(--red);margin-bottom:6px">{{ msg }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if not sources %}
+  <div class="au d1" style="background:var(--amber-d);border:1px solid rgba(251,191,36,.3);border-radius:var(--rs);padding:14px 18px;font-size:12.5px;color:var(--amber)">
+    ⚠️ Aucune source de type <strong>Legs</strong> n'est configurée. Veuillez d'abord créer une source dans l'administration.
+  </div>
+  {% else %}
+  <form method="post">
+    {% csrf_token %}
+
+    <div class="card au d1" style="margin-bottom:14px">
+      <div class="ch"><div class="ch-ico a"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div><div><div class="ch-title">Informations générales</div></div></div>
+      <div class="cb">
+        <div class="fgrid">
+          <div class="field">
+            <label class="flbl">Source (testateur/légataire) <span class="req-dot"></span></label>
+            <select class="fi" name="source" required>
+              <option value="">— Sélectionner —</option>
+              {% for s in sources %}<option value="{{ s.pk }}" {% if post_data.source == s.pk|stringformat:"s" %}selected{% endif %}>{{ s.name }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="field">
+            <label class="flbl">Date de réception <span class="req-dot"></span></label>
+            <input class="fi" type="date" name="received_date" value="{{ post_data.received_date|default:today }}" required>
+          </div>
+          <div class="field">
+            <label class="flbl">Dépôt de réception <span class="req-dot"></span></label>
+            <select class="fi" name="depot" required>
+              <option value="">— Sélectionner —</option>
+              {% for d in depots %}<option value="{{ d.pk }}" {% if post_data.depot == d.pk|stringformat:"s" %}selected{% endif %}>{{ d.nom }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="field">
+            <label class="flbl">N° Document</label>
+            <input class="fi" type="text" name="document_number" value="{{ post_data.document_number|default:'' }}" placeholder="Numéro de pièce…">
+          </div>
+          <div class="field fs2">
+            <label class="flbl">Commentaire</label>
+            <textarea class="fi" name="comment" rows="2" placeholder="Observations…">{{ post_data.comment|default:'' }}</textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card au d2">
+      <div class="ch">
+        <div class="ch-ico g"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div>
+        <div><div class="ch-title">Lignes</div><div class="ch-sub">Matières reçues par legs</div></div>
+        <div class="ch-right">
+          <button type="button" class="btn btn-save btn-sm" id="addLigne">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="11" height="11"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Ajouter une ligne
+          </button>
+        </div>
+      </div>
+      <div class="tbl-scroll">
+        <table>
+          <thead><tr><th style="width:50%">Matière</th><th style="text-align:right">Quantité</th><th style="text-align:right">Valeur unitaire</th><th style="text-align:right">Total</th><th></th></tr></thead>
+          <tbody id="lignesBody">
+            <tr class="ligne-row">
+              <td><select class="fi" name="ligne_matiere" style="font-size:11px;padding:5px 8px">
+                <option value="">— Matière —</option>
+                {% for m in matieres %}<option value="{{ m.pk }}">{{ m.code_court }} — {{ m.designation }}</option>{% endfor %}
+              </select></td>
+              <td><input type="number" class="fi mono" name="ligne_quantite" step="0.001" min="0.001" placeholder="0.000" style="text-align:right;font-size:11px;padding:5px 8px" oninput="calcLigne(this)"></td>
+              <td><input type="number" class="fi mono" name="ligne_pu" step="0.01" min="0" placeholder="0.00" style="text-align:right;font-size:11px;padding:5px 8px" oninput="calcLigne(this)"></td>
+              <td class="mono ligne-total" style="text-align:right;color:var(--green)">—</td>
+              <td style="text-align:center"><button type="button" class="btn btn-danger btn-sm" onclick="removeLigne(this)" style="padding:3px 7px">✕</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="cf"><div></div>
+        <button type="submit" class="btn btn-p">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="13" height="13"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+          Enregistrer le legs
+        </button>
+      </div>
+    </div>
+  </form>
+  {% endif %}
+</div>
+<script>
+function getRowTotal(row){var q=parseFloat(row.querySelector('[name=ligne_quantite]').value)||0;var pu=parseFloat(row.querySelector('[name=ligne_pu]').value)||0;return q*pu;}
+function calcLigne(el){var row=el.closest('tr');var t=getRowTotal(row);row.querySelector('.ligne-total').textContent=t>0?Math.round(t).toLocaleString('fr-FR')+' F':'—';}
+function removeLigne(btn){var tbody=document.getElementById('lignesBody');if(tbody.querySelectorAll('.ligne-row').length<=1)return;btn.closest('tr').remove();}
+document.getElementById('addLigne').addEventListener('click',function(){var tbody=document.getElementById('lignesBody');var first=tbody.querySelector('.ligne-row');var clone=first.cloneNode(true);clone.querySelectorAll('input').forEach(function(i){i.value='';});clone.querySelectorAll('select').forEach(function(s){s.selectedIndex=0;});clone.querySelector('.ligne-total').textContent='—';tbody.appendChild(clone);});
+document.getElementById('lignesBody').addEventListener('input',function(e){if(e.target.matches('[name=ligne_quantite],[name=ligne_pu]'))calcLigne(e.target);});
+</script>
+{% endblock %}
