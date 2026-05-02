@@ -14,3 +14,13 @@ class CoreConfig(AppConfig):
         from django.contrib import admin
         from core.admin_site import ENSMGAdminSite
         admin.site.__class__ = ENSMGAdminSite
+
+        # Contrainte : un seul Chef de service autorisé
+        from django.db.models.signals import m2m_changed
+        from django.contrib.auth.models import User
+        from core.signals import un_seul_chef_de_service
+        m2m_changed.connect(
+            un_seul_chef_de_service,
+            sender=User.groups.through,
+            dispatch_uid='core.un_seul_chef_de_service',
+        )
