@@ -1,0 +1,64 @@
+# .github/workflows/ci.yml
+# Intégration continue — exécutée à chaque push et pull request sur main/develop.
+
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  test:
+    name: Tests Django
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Mise en place Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Installation des dépendances
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+
+      - name: Vérification système Django (check)
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings.dev
+          DJANGO_SECRET_KEY: ci-insecure-key-not-for-production
+        run: python manage.py check --deploy || true
+
+      - name: Exécution des tests
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings.dev
+          DJANGO_SECRET_KEY: ci-insecure-key-not-for-production
+        run: python manage.py test --verbosity=2
+
+  lint:
+    name: Lint (flake8)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Mise en place Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Installation flake8
+        run: pip install flake8
+
+      - name: Analyse flake8
+        run: |
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics             --exclude=.venv,migrations,staticfiles

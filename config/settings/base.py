@@ -75,7 +75,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # ---------------------------------------------------------------------------
 # Authentification — redirections
 # ---------------------------------------------------------------------------
-LOGIN_URL = '/admin/login/'
+LOGIN_URL = '/app/login/'
 LOGIN_REDIRECT_URL = '/app/'
 LOGOUT_REDIRECT_URL = '/'
 

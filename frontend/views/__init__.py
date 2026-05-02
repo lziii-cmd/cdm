@@ -32,6 +32,8 @@ from .referentiels import (
     UnitesListView,
 )
 from .system import (
+    LoginView,
+    LogoutView,
     ExercicesListView,
     LivreJournalView,
     NotificationsView,

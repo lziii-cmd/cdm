@@ -1,8 +1,63 @@
 # frontend/views/system.py
-from django.contrib import messages
-from django.shortcuts import redirect
+import logging
+from django.contrib import messages, auth
+from django.contrib.auth import authenticate, login as auth_login
+from django.shortcuts import redirect, render
+from django.views import View
 from .base import FrontendView
 from core.roles import is_superadmin, is_chef_service
+
+logger = logging.getLogger(__name__)
+
+
+class LoginView(View):
+    """Page de connexion frontend — remplace /admin/login/."""
+    template_name = 'v2/misc/login.html'
+
+    def get(self, request):
+        if request.user.is_authenticated:
+            return redirect('frontend:dashboard')
+        return render(request, self.template_name, {
+            'next': request.GET.get('next', '/app/')
+        })
+
+    def post(self, request):
+        username = request.POST.get('username', '').strip()
+        password = request.POST.get('password', '')
+        next_url = request.POST.get('next', '/app/')
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            auth_login(request, user)
+            logger.info("Connexion réussie : %s", username)
+            return redirect(next_url if next_url.startswith('/') else '/app/')
+        else:
+            # Distinguer compte désactivé de mauvais identifiants
+            from django.contrib.auth import get_user_model
+            UserModel = get_user_model()
+            try:
+                existing = UserModel.objects.get(username=username)
+                if not existing.is_active:
+                    messages.error(request, "Ce compte est désactivé.")
+                else:
+                    messages.error(request, "Identifiant ou mot de passe incorrect.")
+            except UserModel.DoesNotExist:
+                messages.error(request, "Identifiant ou mot de passe incorrect.")
+        return render(request, self.template_name, {
+            'username': username,
+            'next': next_url,
+        })
+
+
+class LogoutView(View):
+    """Déconnexion — POST uniquement (protection CSRF)."""
+
+    def post(self, request):
+        auth.logout(request)
+        return redirect('/')
+
+    def get(self, request):
+        # Sécurité : le GET redirige sans déconnecter
+        return redirect('frontend:dashboard')
 
 
 class ExercicesListView(FrontendView):

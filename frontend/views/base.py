@@ -20,12 +20,14 @@ class FrontendView(LoginRequiredMixin, TemplateView):
     active_page    = 'dashboard'
     inventory_view = False
     agent_perm_key = None
-    login_url      = '/admin/login/'
+    login_url      = '/app/login/'
 
     # ── dispatch : contrôle d'accès par rôle ──────────────────────────────────
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return redirect(self.login_url)
+            from urllib.parse import urlencode
+            next_url = request.get_full_path()
+            return redirect(f"{self.login_url}?{urlencode({'next': next_url})}")
 
         from core.roles import get_user_role, agent_has_perm, ROLE_SUPERADMIN, ROLE_AGENT
 

@@ -6,9 +6,6 @@
 Django==5.0.6
 asgiref==3.9.1
 
-# Interface d'administration — filtres avancés par plage de dates
-django-admin-rangefilter==0.13.3
-
 # Génération PDF (documents officiels, rapports)
 weasyprint==68.1
 brotli==1.2.0
@@ -22,10 +19,6 @@ tinycss2==1.5.1
 tinyhtml5==2.0.0
 webencodings==0.5.1
 zopfli==0.4.1
-
-# Graphiques / images dans les rapports
-reportlab==4.4.3
-pillow==11.3.0
 
 # Base de données (production : PostgreSQL)
 psycopg2-binary==2.9.11
