@@ -1,92 +1,38 @@
-{% extends "admin/base_site.html" %}
+{% extends "v2/base.html" %}
 {% load i18n %}
 
-{% block title %}{{ titre_page }} | ENSMG{% endblock %}
-
-{% block breadcrumbs %}
-<div class="breadcrumbs">
-  <a href="{% url 'frontend:dashboard' %}">Accueil</a>
-  &rsaquo; <a href="/documents/">Documents &amp; Registres</a>
-  &rsaquo; {{ titre_page }}
-</div>
+{% block page_title %}{{ titre_page }} — ENSMG{% endblock %}
+{% block page_title_short %}{{ titre_page }}{% endblock %}
+{% block breadcrumb %}
+<a href="{% url 'frontend:dashboard' %}">Accueil</a><span class="bread-sep">›</span>
+<a href="/documents/">Documents &amp; Registres</a><span class="bread-sep">›</span>
+<span class="bread-cur">{{ titre_page }}</span>
 {% endblock %}
 
-{% block content_title %}<h1>{{ titre_page }}</h1>{% endblock %}
-
 {% block content %}
-<style>
-  #content, #content-main, .content, #main, #content-wrapper, .content-wrapper {
-    max-width: none !important; width: 100% !important;
-  }
-  .fi-toolbar {
-    display: flex; align-items: center; flex-wrap: wrap;
-    gap: 10px; margin-bottom: 18px;
-  }
-  .fi-select-ex {
-    display: flex; align-items: center; gap: 6px;
-    background: #f9fafb; border: 1px solid #d1d5db;
-    border-radius: 6px; padding: 5px 10px;
-    font-size: 13px; font-weight: 600; color: #374151;
-  }
-  .fi-select-ex select {
-    border: none; background: transparent;
-    font-size: 13px; font-weight: 600; color: #1e3a5f;
-    outline: none; cursor: pointer; min-width: 200px;
-  }
-  .fi-search {
-    display: flex; align-items: center;
-    border: 1px solid #d1d5db; border-radius: 6px;
-    background: #fff; overflow: hidden; height: 34px; flex: 1; max-width: 320px;
-  }
-  .fi-search input {
-    border: none; outline: none; padding: 0 10px;
-    font-size: 13px; width: 100%; height: 100%;
-  }
-  .fi-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  .fi-table th {
-    background: #f3f4f6; font-weight: 600; text-align: left;
-    padding: 7px 10px; border-bottom: 2px solid #d1d5db;
-    font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: #374151;
-  }
-  .fi-table td {
-    padding: 9px 10px; border-bottom: 1px solid #e5e7eb; vertical-align: middle;
-  }
-  /* Ligne cliquable */
-  .fi-table tbody tr {
-    cursor: pointer; transition: background .12s;
-  }
-  .fi-table tbody tr:hover td {
-    background: #eff6ff;
-  }
-  /* Indicateur visuel discret */
-  .fi-table tbody tr td:last-child::after {
-    content: "📄";
-    float: right;
-    opacity: 0;
-    transition: opacity .15s;
-  }
-  .fi-table tbody tr:hover td:last-child::after { opacity: 1; }
+<div class="pi">
 
-  .badge-compte {
-    display: inline-block; background: #e0e7ff; color: #3730a3;
-    border-radius: 4px; padding: 1px 6px; font-size: 11px;
-    font-family: monospace; font-weight: 700;
-  }
-  .fi-tip {
-    display: flex; align-items: center; gap: 6px;
-    background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px;
-    padding: 8px 14px; font-size: 12px; color: #1d4ed8; margin-bottom: 14px;
-  }
+<style>
+  .fi-toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+  .fi-select-ex{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:5px 10px;font-size:12px;font-weight:600;color:var(--t2)}
+  .fi-select-ex select{border:none;background:transparent;font-size:12px;font-weight:600;color:var(--accent);outline:none;cursor:pointer;min-width:200px;font-family:var(--mono)}
+  .fi-search{display:flex;align-items:center;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);overflow:hidden;height:32px;flex:1;max-width:320px;transition:border-color .14s}
+  .fi-search:focus-within{border-color:var(--border-focus)}
+  .fi-search input{border:none;outline:none;padding:0 10px;font-size:12px;width:100%;height:100%;background:transparent;color:var(--t1)}
+  .fi-search input::placeholder{color:var(--t3)}
+  .fi-count{font-size:12px;color:var(--t2)}
+  .badge-compte{display:inline-block;background:var(--accent-d);color:var(--accent);border-radius:4px;padding:1px 6px;font-size:11px;font-family:var(--mono);font-weight:700}
+  .tab-desc{font-size:11.5px;color:var(--t2);background:var(--accent-d);border-left:3px solid var(--accent);padding:8px 14px;border-radius:0 var(--rs) var(--rs) 0;margin-bottom:12px}
 </style>
 
-<div class="fi-tip">
-  💡 Cliquez sur une ligne pour générer directement le document PDF.
-</div>
+<p class="tab-desc">
+  💡 Cliquez sur une ligne pour générer directement la fiche de stock en PDF.
+</p>
 
 <div class="fi-toolbar">
   <div class="fi-select-ex">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-    <span>Exercice :</span>
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Exercice :
     <select id="exSelect">
       {% for ex in exercices %}
       <option value="{{ ex.pk }}" {% if ex.pk == exercice.pk %}selected{% endif %}>
@@ -96,14 +42,14 @@
     </select>
   </div>
   <div class="fi-search">
-    <input type="text" id="searchInput" placeholder="Rechercher par code ou désignation…">
+    <input type="text" id="searchInput" placeholder="Rechercher par code ou désignation…" autocomplete="off">
   </div>
-  <div style="color: #6b7280; font-size: 12px;">
+  <div class="fi-count">
     <strong id="countDisplay">{{ matieres|length }}</strong> matière{% if matieres|length != 1 %}s{% endif %}
   </div>
 </div>
 
-<table class="fi-table" id="fichesTable">
+<table id="fichesTable">
   <thead>
     <tr>
       <th>N° Compte</th>
@@ -136,13 +82,12 @@
   var countDisplay= document.getElementById('countDisplay');
 
   function getUrl(row) {
-    var exPk  = exSelect.value;
-    var base  = row.getAttribute('data-url-base');
-    var mPk   = row.getAttribute('data-matiere-pk');
+    var exPk = exSelect.value;
+    var base = row.getAttribute('data-url-base');
+    var mPk  = row.getAttribute('data-matiere-pk');
     return base + mPk + '/exercice/' + exPk + '/';
   }
 
-  /* Clic sur ligne → ouvrir le document PDF dans un nouvel onglet */
   rows.forEach(function(row) {
     row.addEventListener('click', function() {
       window.open(getUrl(row), '_blank');
@@ -161,8 +106,9 @@
     countDisplay.textContent = visible;
   }
 
-  exSelect.addEventListener('change', function() { /* URLs calculées à la volée au clic */ });
   searchInput.addEventListener('input', filterRows);
 })();
 </script>
+
+</div>
 {% endblock %}

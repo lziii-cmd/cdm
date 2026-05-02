@@ -18,6 +18,26 @@ from documents.utils import render_pdf
 from core.models import Exercice
 from inventory.models import MouvementStock
 from catalog.models import Matiere
+
+
+def v2_ctx(request, active_page='documents'):
+    """Fournit les variables de contexte nécessaires à v2/base.html (sidebar, rôle…)."""
+    from core.roles import get_user_role, get_agent_perms, ROLE_SUPERADMIN, ROLE_CHEF_SERVICE, ROLE_AGENT
+    from core.models import Notification
+    role = get_user_role(request.user)
+    try:
+        notif_count = Notification.objects.filter(lue=False).count()
+    except Exception:
+        notif_count = 0
+    return {
+        'active_page':    active_page,
+        'notif_count':    notif_count,
+        'user_role':      role,
+        'is_superadmin':  role == ROLE_SUPERADMIN,
+        'is_chef_service': role == ROLE_CHEF_SERVICE,
+        'is_agent':       role == ROLE_AGENT,
+        'agent_perms':    get_agent_perms(request.user) if role == ROLE_AGENT else None,
+    }
 from catalog.models.compte import ComptePrincipal, CompteDivisionnaire, SousCompte
 
 
@@ -361,7 +381,7 @@ def grand_livre(request, exercice_pk=None):
         })
 
     return render_to_response(request, "documents/grand_livre_index.html", {
-        **django_admin.site.each_context(request),
+        **v2_ctx(request),
         "titre_page":   "Grand Journal des Matières",
         "title":        "Grand Journal des Matières",
         "description":  "Liste de toutes les matières de l'exercice.",
@@ -532,7 +552,7 @@ def grand_livre_comptes(request, exercice_pk=None):
                     nb_avec += 1
 
     return render_to_response(request, "documents/grand_livre_index.html", {
-        **django_admin.site.each_context(request),
+        **v2_ctx(request),
         "titre_page":   "Grand Livre des Comptes",
         "title":        "Grand Livre des Comptes",
         "description":  "Liste des sous-comptes de la nomenclature.",
@@ -1173,7 +1193,7 @@ def grand_livre_journaux(request, exercice_pk=None):
             nb_avec += 1
 
     return render_to_response(request, "documents/grand_livre_index.html", {
-        **django_admin.site.each_context(request),
+        **v2_ctx(request),
         "titre_page":    "Grand Livre des Journaux",
         "title":         "Grand Livre des Journaux",
         "description":   "Liste des journaux comptables de l'exercice.",
@@ -1795,7 +1815,7 @@ def documents_hub(request):
         type_sortie=OperationSortie.TypeSortie.CERTIFICAT_ADMIN
     ).count()
     return render_to_response(request, "documents/documents_hub.html", {
-        **django_admin.site.each_context(request),
+        **v2_ctx(request),
         "exercice": exercice,
         "exercices": exercices,
         "depots": depots,
@@ -1818,7 +1838,7 @@ def reformes_list(request):
         .order_by("-date_sortie")
     )
     return render_to_response(request, "documents/reformes_list.html", {
-        **django_admin.site.each_context(request),
+        **v2_ctx(request),
         "sorties": sorties,
         "titre_page": "Réformes & Destructions",
     })
@@ -1837,7 +1857,7 @@ def reforme_detail(request, sortie_pk):
     lignes = list(operation.lignes.select_related("matiere__unite").all())
     total_valeur = sum((lg.total_ligne or Decimal("0")) for lg in lignes)
     return render_to_response(request, "documents/reformes_detail.html", {
-        **django_admin.site.each_context(request),
+        **v2_ctx(request),
         "operation":    operation,
         "lignes":       lignes,
         "nb_lignes":    len(lignes),
@@ -1858,7 +1878,7 @@ def certificats_admin_list(request):
         .order_by("-date_sortie")
     )
     return render_to_response(request, "documents/certificats_admin_list.html", {
-        **django_admin.site.each_context(request),
+        **v2_ctx(request),
         "sorties": sorties,
         "titre_page": "Certificats Administratifs",
     })
@@ -1873,7 +1893,7 @@ def fiches_stock_index(request):
         "sous_compte__compte_divisionnaire__compte_principal", "unite"
     ).order_by("code_court")
     return render_to_response(request, "documents/fiches_index.html", {
-        **django_admin.site.each_context(request),
+        **v2_ctx(request),
         "matieres": matieres,
         "exercice": exercice,
         "exercices": exercices,
@@ -1892,7 +1912,7 @@ def fiches_inventaire_index(request):
         "sous_compte__compte_divisionnaire__compte_principal", "unite"
     ).order_by("code_court")
     return render_to_response(request, "documents/fiches_index.html", {
-        **django_admin.site.each_context(request),
+        **v2_ctx(request),
         "matieres": matieres,
         "exercice": exercice,
         "exercices": exercices,
@@ -1910,7 +1930,7 @@ def comptes_gestion_index(request):
     exercices = Exercice.objects.order_by("-annee")
     depots = Depot.objects.filter(actif=True).order_by("identifiant")
     return render_to_response(request, "documents/comptes_gestion_index.html", {
-        **django_admin.site.each_context(request),
+        **v2_ctx(request),
         "depots": depots,
         "exercice": exercice,
         "exercices": exercices,
@@ -1924,7 +1944,7 @@ def pv_recensement_index(request):
     exercice = Exercice.objects.filter(statut="OUVERT").order_by("-annee").first()
     exercices = Exercice.objects.order_by("-annee")
     return render_to_response(request, "documents/pv_recensement_index.html", {
-        **django_admin.site.each_context(request),
+        **v2_ctx(request),
         "exercice": exercice,
         "exercices": exercices,
         "titre_page": "PV de Recensement",
