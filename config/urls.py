@@ -29,14 +29,14 @@ def admin_index_redirect(request):
     """Intercepte /admin/ (index uniquement) → redirige vers /app/ si connecté."""
     if request.user.is_authenticated:
         return redirect('/app/')
-    return redirect('/admin/login/?next=/app/')
+    return redirect('/app/login/?next=/app/')
 
 
 def admin_redirect(request):
     """Redirige /admin/ vers /app/ si déjà connecté, sinon vers la page de login."""
     if request.user.is_authenticated:
         return redirect('/app/')
-    return redirect('/admin/login/?next=/app/')
+    return redirect('/app/login/?next=/app/')
 
 
 urlpatterns = [

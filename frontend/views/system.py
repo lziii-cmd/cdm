@@ -140,7 +140,7 @@ class SettingsView(FrontendView):
     active_page = 'settings'
 
     def dispatch(self, request, *args, **kwargs):
-        if not is_superadmin(request.user) and not is_chef_service(request.user):
-            messages.error(request, "Accès refusé. Cette page est réservée aux administrateurs.")
+        if not is_superadmin(request.user):
+            messages.error(request, "Accès refusé. Cette page est réservée à l'administrateur système.")
             return redirect('frontend:dashboard')
         return super().dispatch(request, *args, **kwargs)

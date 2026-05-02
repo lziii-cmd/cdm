@@ -50,8 +50,13 @@ class AgentPermission(models.Model):
     perm_services             = models.BooleanField(default=True,  verbose_name="Services")
     perm_unites               = models.BooleanField(default=True,  verbose_name="Unités de mesure")
 
-    # ── Registres ──
+    # ── Registres & Documents ──
     perm_livre_journal        = models.BooleanField(default=True,  verbose_name="Grand Journal")
+    perm_grand_livre          = models.BooleanField(default=True,  verbose_name="Grand Livre (par matière)")
+    perm_fiches_stock         = models.BooleanField(default=True,  verbose_name="Fiches de stock")
+    perm_pv_recensement       = models.BooleanField(default=False, verbose_name="PV de recensement")
+    perm_comptes_gestion      = models.BooleanField(default=False, verbose_name="Comptes de gestion")
+    perm_reformes_docs        = models.BooleanField(default=False, verbose_name="Réformes & Destructions (docs)")
 
     class Meta:
         verbose_name = "Permissions agent"

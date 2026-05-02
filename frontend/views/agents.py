@@ -21,7 +21,7 @@ class ChefServiceRequiredMixin:
     """Restreint la vue au chef de service uniquement."""
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return redirect('/admin/login/')
+            return redirect('/app/login/')
         if get_user_role(request.user) != ROLE_CHEF_SERVICE:
             messages.error(request, "Cette section est réservée au chef de service.")
             return redirect('frontend:dashboard')
@@ -91,8 +91,13 @@ class AgentPermissionsEditView(ChefServiceRequiredMixin, FrontendView):
             ("perm_services",     "Services"),
             ("perm_unites",       "Unités de mesure"),
         ]),
-        ("Registres", [
-            ("perm_livre_journal", "Grand Journal"),
+        ("Registres & Documents", [
+            ("perm_livre_journal",   "Grand Journal"),
+            ("perm_grand_livre",     "Grand Livre (par matière)"),
+            ("perm_fiches_stock",    "Fiches de stock"),
+            ("perm_pv_recensement",  "PV de recensement"),
+            ("perm_comptes_gestion", "Comptes de gestion"),
+            ("perm_reformes_docs",   "Réformes & Destructions (docs)"),
         ]),
     ]
 
@@ -107,9 +112,15 @@ class AgentPermissionsEditView(ChefServiceRequiredMixin, FrontendView):
             rows = [(key, label, getattr(perms, key)) for key, label in fields]
             perm_groups_values.append((group_label, rows))
 
+        # Compteurs pour le résumé
+        all_keys = [key for _, fields in self.PERM_GROUPS for key, _ in fields]
+        nb_actifs = sum(1 for key in all_keys if getattr(perms, key, False))
+
         ctx['agent']        = agent
         ctx['perms']        = perms
         ctx['perm_groups']  = perm_groups_values
+        ctx['nb_actifs']    = nb_actifs
+        ctx['nb_total']     = len(all_keys)
         return ctx
 
     def post(self, request, pk):
