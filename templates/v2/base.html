@@ -64,7 +64,7 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opac
 @keyframes nd{0%,100%{box-shadow:0 0 0 0 rgba(248,113,113,.4)}50%{box-shadow:0 0 0 4px rgba(248,113,113,0)}}
 .tp-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--green));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#050810;cursor:pointer;text-decoration:none;user-select:none}
 .tp-user-wrap{position:relative}
-.tp-user-menu{position:absolute;right:0;top:calc(100% + 8px);width:200px;background:var(--surface2);border:1px solid var(--border-h);border-radius:var(--r);box-shadow:0 8px 32px rgba(0,0,0,.45);z-index:9999;display:none;overflow:hidden;animation:fup .2s var(--ease) both}
+.tp-user-menu{position:fixed;right:16px;top:56px;width:210px;background:var(--surface2);border:1px solid var(--border-h);border-radius:var(--r);box-shadow:0 8px 32px rgba(0,0,0,.55);z-index:9999;display:none;overflow:hidden;animation:fup .2s var(--ease) both}
 .tp-user-menu.open{display:block}
 .tp-user-menu-header{padding:12px 14px 10px;border-bottom:1px solid var(--border)}
 .tp-user-menu-name{font-size:12px;font-weight:700;color:var(--t1)}
