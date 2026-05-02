@@ -1,0 +1,43 @@
+{% extends 'v2/base.html' %}
+{% block page_title %}Supprimer {{ edited_user.username }} — ENSMG{% endblock %}
+{% block page_title_short %}Supprimer utilisateur{% endblock %}
+{% block breadcrumb %}
+<a href="{% url 'frontend:dashboard' %}">Accueil</a><span class="bread-sep">›</span>
+<a href="{% url 'frontend:users' %}">Utilisateurs</a><span class="bread-sep">›</span>
+<span class="bread-cur">Supprimer</span>
+{% endblock %}
+
+{% block content %}
+<div class="pi">
+  <div class="ph au">
+    <div class="ph-left"><div class="ph-title">Supprimer un compte</div></div>
+    <div class="ph-right"><a href="{% url 'frontend:users' %}" class="btn btn-o btn-sm">← Retour</a></div>
+  </div>
+
+  <div class="au d1" style="max-width:480px">
+    <div class="card">
+      <div class="ch">
+        <div class="ch-ico r"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg></div>
+        <div><div class="ch-title">Confirmer la suppression</div></div>
+      </div>
+      <div class="cb">
+        <p style="font-size:13px;color:var(--t2);margin-bottom:16px;line-height:1.6">
+          Vous êtes sur le point de supprimer définitivement le compte
+          <strong style="color:var(--t1)">{{ edited_user.username }}</strong>.
+          Cette action est irréversible.
+        </p>
+        <div style="display:flex;gap:8px">
+          <form method="POST" action="{% url 'frontend:user_delete' pk=edited_user.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+              Supprimer définitivement
+            </button>
+          </form>
+          <a href="{% url 'frontend:users' %}" class="btn btn-o">Annuler</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

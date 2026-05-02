@@ -1,0 +1,105 @@
+{% extends 'v2/base.html' %}
+{% block page_title %}Modifier {{ edited_user.username }} — ENSMG{% endblock %}
+{% block page_title_short %}Modifier utilisateur{% endblock %}
+{% block breadcrumb %}
+<a href="{% url 'frontend:dashboard' %}">Accueil</a><span class="bread-sep">›</span>
+<a href="{% url 'frontend:users' %}">Utilisateurs</a><span class="bread-sep">›</span>
+<span class="bread-cur">{{ edited_user.username }}</span>
+{% endblock %}
+
+{% block content %}
+<div class="pi">
+  <div class="ph au">
+    <div class="ph-left">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;
+          {% if edited_user_role == 'superadmin' %}background:var(--red-d);color:var(--red)
+          {% elif edited_user_role == 'chef_service' %}background:var(--accent-d);color:var(--accent)
+          {% else %}background:var(--purple-d);color:var(--purple){% endif %}">
+          {{ edited_user.username|first|upper }}
+        </div>
+        <div>
+          <div class="ph-title">{{ edited_user.username }}</div>
+          <div class="ph-sub">{{ edited_user.email|default:"Aucun email" }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="ph-right"><a href="{% url 'frontend:users' %}" class="btn btn-o btn-sm">← Retour</a></div>
+  </div>
+
+  {% if messages %}
+  <div class="au d1">
+    {% for msg in messages %}
+    <div style="padding:10px 14px;border-radius:var(--rs);font-size:12px;font-weight:600;background:var(--red-d);color:var(--red);border:1px solid rgba(248,113,113,.25)">{{ msg }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="au d1" style="max-width:520px">
+    <div class="card">
+      <div class="ch">
+        <div class="ch-ico b"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></div>
+        <div><div class="ch-title">Modifier le compte</div><div class="ch-sub">Laissez le mot de passe vide pour ne pas le changer</div></div>
+      </div>
+      <div class="cb">
+        <form method="POST" action="{% url 'frontend:user_edit' pk=edited_user.pk %}">
+          {% csrf_token %}
+          <div style="display:flex;flex-direction:column;gap:14px">
+
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--t2)">Nom d'utilisateur</label>
+              <div style="background:var(--surface3);border:1px solid var(--border);border-radius:var(--rx);padding:9px 12px;font-size:13px;color:var(--t3);font-family:var(--font)">
+                {{ edited_user.username }}
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--t2)">Email</label>
+              <input type="email" name="email" value="{{ edited_user.email }}" placeholder="ex: moussa@ensmg.sn"
+                style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rx);padding:9px 12px;font-size:13px;color:var(--t1);font-family:var(--font);outline:none;transition:border-color .14s"
+                onfocus="this.style.borderColor='var(--border-focus)'" onblur="this.style.borderColor='var(--border)'">
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--t2)">Rôle</label>
+              <select name="role" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rx);padding:9px 12px;font-size:13px;color:var(--t1);font-family:var(--font);outline:none;appearance:none">
+                <option value="agent" {% if edited_user_role == 'agent' %}selected{% endif %}>Agent simple</option>
+                <option value="chef_service" {% if edited_user_role == 'chef_service' %}selected{% endif %}>Chef de service</option>
+                <option value="superadmin" {% if edited_user_role == 'superadmin' %}selected{% endif %}>Super Administrateur</option>
+              </select>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--t2)">Nouveau mot de passe</label>
+              <input type="password" name="password" placeholder="Laisser vide pour ne pas changer"
+                style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rx);padding:9px 12px;font-size:13px;color:var(--t1);font-family:var(--font);outline:none;transition:border-color .14s"
+                onfocus="this.style.borderColor='var(--border-focus)'" onblur="this.style.borderColor='var(--border)'">
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--t2)">Confirmer le mot de passe</label>
+              <input type="password" name="password2" placeholder="Répéter le nouveau mot de passe"
+                style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rx);padding:9px 12px;font-size:13px;color:var(--t1);font-family:var(--font);outline:none;transition:border-color .14s"
+                onfocus="this.style.borderColor='var(--border-focus)'" onblur="this.style.borderColor='var(--border)'">
+            </div>
+
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface2);border-radius:var(--rs);border:1px solid var(--border)">
+              <input type="checkbox" name="is_active" id="is_active" {% if edited_user.is_active %}checked{% endif %}
+                style="width:15px;height:15px;accent-color:var(--accent);cursor:pointer">
+              <label for="is_active" style="font-size:13px;color:var(--t1);cursor:pointer">Compte actif</label>
+            </div>
+
+            <div style="display:flex;gap:8px;margin-top:4px">
+              <button type="submit" class="btn btn-p">
+                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                Enregistrer
+              </button>
+              <a href="{% url 'frontend:users' %}" class="btn btn-o">Annuler</a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

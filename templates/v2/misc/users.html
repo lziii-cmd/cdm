@@ -1,0 +1,111 @@
+{% extends 'v2/base.html' %}
+{% block page_title %}Utilisateurs — ENSMG{% endblock %}
+{% block page_title_short %}Utilisateurs{% endblock %}
+{% block breadcrumb %}
+<a href="{% url 'frontend:dashboard' %}">Accueil</a><span class="bread-sep">›</span>
+<span class="bread-cur">Utilisateurs</span>
+{% endblock %}
+
+{% block content %}
+<div class="pi">
+  <div class="ph au">
+    <div class="ph-left">
+      <div class="ph-title">Gestion des utilisateurs</div>
+      <div class="ph-sub">Créer et administrer les comptes du système</div>
+    </div>
+    <div class="ph-right">
+      <a href="{% url 'frontend:user_create' %}" class="btn btn-p">
+        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Nouvel utilisateur
+      </a>
+    </div>
+  </div>
+
+  {% if messages %}
+  <div class="au d1">
+    {% for msg in messages %}
+    <div style="padding:10px 14px;border-radius:var(--rs);font-size:12px;font-weight:600;
+      {% if msg.tags == 'error' %}background:var(--red-d);color:var(--red);border:1px solid rgba(248,113,113,.25)
+      {% else %}background:var(--green-d);color:var(--green);border:1px solid rgba(74,222,154,.25){% endif %}">
+      {{ msg }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="au d1">
+    <div class="card">
+      <div class="ch">
+        <div class="ch-ico b"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg></div>
+        <div><div class="ch-title">Comptes ({{ users_list|length }})</div></div>
+      </div>
+      <div class="cb">
+        {% if users_list %}
+        <table style="width:100%;border-collapse:collapse;font-size:13px">
+          <thead>
+            <tr>
+              <th style="padding:8px 10px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--t3);border-bottom:1px solid var(--border)">Utilisateur</th>
+              <th style="padding:8px 10px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--t3);border-bottom:1px solid var(--border)">Email</th>
+              <th style="padding:8px 10px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--t3);border-bottom:1px solid var(--border)">Rôle</th>
+              <th style="padding:8px 10px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--t3);border-bottom:1px solid var(--border)">Statut</th>
+              <th style="padding:8px 10px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--t3);border-bottom:1px solid var(--border)">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in users_list %}
+            <tr style="border-bottom:1px solid rgba(255,255,255,.03)">
+              <td style="padding:10px">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;
+                    {% if item.role == 'superadmin' %}background:var(--red-d);color:var(--red)
+                    {% elif item.role == 'chef_service' %}background:var(--accent-d);color:var(--accent)
+                    {% else %}background:var(--purple-d);color:var(--purple){% endif %}">
+                    {{ item.user.username|first|upper }}
+                  </div>
+                  <div>
+                    <div style="color:var(--t1);font-weight:600">{{ item.user.username }}</div>
+                    {% if item.user.pk == request.user.pk %}<div style="font-size:9px;color:var(--t3)">Vous</div>{% endif %}
+                  </div>
+                </div>
+              </td>
+              <td style="padding:10px;color:var(--t2)">{{ item.user.email|default:"—" }}</td>
+              <td style="padding:10px">
+                {% if item.role == 'superadmin' %}
+                <span style="background:var(--red-d);color:var(--red);padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700">Super Admin</span>
+                {% elif item.role == 'chef_service' %}
+                <span style="background:var(--accent-d);color:var(--accent);padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700">Chef de service</span>
+                {% else %}
+                <span style="background:var(--purple-d);color:var(--purple);padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700">Agent simple</span>
+                {% endif %}
+              </td>
+              <td style="padding:10px">
+                {% if item.user.is_active %}
+                <span style="background:var(--green-d);color:var(--green);padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700">Actif</span>
+                {% else %}
+                <span style="background:var(--red-d);color:var(--red);padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700">Inactif</span>
+                {% endif %}
+              </td>
+              <td style="padding:10px">
+                <div style="display:flex;gap:6px">
+                  <a href="{% url 'frontend:user_edit' pk=item.user.pk %}" class="btn btn-o btn-sm">Modifier</a>
+                  {% if item.user.pk != request.user.pk %}
+                  <a href="{% url 'frontend:user_delete' pk=item.user.pk %}" class="btn btn-danger btn-sm">Supprimer</a>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div style="text-align:center;padding:40px;color:var(--t3)">
+          <div style="font-size:32px;margin-bottom:8px">👤</div>
+          <div style="font-size:14px;font-weight:600;color:var(--t2);margin-bottom:4px">Aucun utilisateur</div>
+          <a href="{% url 'frontend:user_create' %}" class="btn btn-p" style="margin-top:16px;display:inline-flex">Créer un utilisateur</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

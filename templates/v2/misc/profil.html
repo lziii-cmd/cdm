@@ -1,0 +1,80 @@
+{% extends 'v2/base.html' %}
+{% block page_title %}Mon profil — ENSMG{% endblock %}
+{% block page_title_short %}Profil{% endblock %}
+{% block breadcrumb %}
+<a href="{% url 'frontend:dashboard' %}">Accueil</a><span class="bread-sep">›</span><span class="bread-cur">Mon profil</span>
+{% endblock %}
+{% block content %}
+<div class="pi">
+  <div class="ph au">
+    <div class="ph-left"><div class="ph-title">Mon profil</div><div class="ph-sub">Informations de votre compte</div></div>
+  </div>
+
+  {% if messages %}
+  <div class="au d1">
+    {% for msg in messages %}
+    <div style="padding:10px 14px;border-radius:var(--rs);font-size:12px;font-weight:600;
+      {% if msg.tags == 'error' %}background:var(--red-d);color:var(--red);border:1px solid rgba(248,113,113,.25)
+      {% else %}background:var(--green-d);color:var(--green);border:1px solid rgba(74,222,154,.25){% endif %}">
+      {{ msg }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="g2 au d1">
+    <div class="card">
+      <div class="ch">
+        <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--green));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#050810">{{ request.user.username|first|upper }}</div>
+        <div><div class="ch-title">{{ request.user.get_full_name|default:request.user.username }}</div><div class="ch-sub">{{ request.user.email|default:"—" }}</div></div>
+      </div>
+      <div class="cb">
+        <div class="info-grid g2" style="margin:-16px">
+          <div class="info-cell"><div class="info-cell-lbl">Nom d'utilisateur</div><div class="info-cell-val mono">{{ request.user.username }}</div></div>
+          <div class="info-cell"><div class="info-cell-lbl">Email</div><div class="info-cell-val">{{ request.user.email|default:"—" }}</div></div>
+          <div class="info-cell"><div class="info-cell-lbl">Prénom</div><div class="info-cell-val">{{ request.user.first_name|default:"—" }}</div></div>
+          <div class="info-cell"><div class="info-cell-lbl">Nom</div><div class="info-cell-val">{{ request.user.last_name|default:"—" }}</div></div>
+          <div class="info-cell"><div class="info-cell-lbl">Statut</div><div class="info-cell-val"><span class="badge {% if request.user.is_active %}bg{% else %}br{% endif %}">{% if request.user.is_active %}Actif{% else %}Inactif{% endif %}</span></div></div>
+          <div class="info-cell"><div class="info-cell-lbl">Rôle</div><div class="info-cell-val">
+            {% if is_superadmin %}<span style="color:var(--red)">Super Admin</span>
+            {% elif is_chef_service %}<span style="color:var(--accent)">Chef de service</span>
+            {% else %}<span style="color:var(--purple)">Agent simple</span>{% endif %}
+          </div></div>
+        </div>
+      </div>
+      {% if is_superadmin %}
+      <div class="cf">
+        <div></div>
+        <a href="{% url 'frontend:user_edit' pk=request.user.pk %}" class="btn btn-o btn-sm">✏ Modifier</a>
+      </div>
+      {% endif %}
+    </div>
+    <div class="card">
+      <div class="ch"><div class="ch-ico b"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg></div><div><div class="ch-title">Sécurité</div><div class="ch-sub">Changer votre mot de passe</div></div></div>
+      <div class="cb">
+        <form method="POST" action="{% url 'frontend:profil' %}">
+          {% csrf_token %}
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--t2)">Nouveau mot de passe</label>
+              <input type="password" name="password" placeholder="Nouveau mot de passe"
+                style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rx);padding:9px 12px;font-size:13px;color:var(--t1);font-family:var(--font);outline:none;transition:border-color .14s"
+                onfocus="this.style.borderColor='var(--border-focus)'" onblur="this.style.borderColor='var(--border)'">
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--t2)">Confirmer le mot de passe</label>
+              <input type="password" name="password2" placeholder="Répéter le mot de passe"
+                style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rx);padding:9px 12px;font-size:13px;color:var(--t1);font-family:var(--font);outline:none;transition:border-color .14s"
+                onfocus="this.style.borderColor='var(--border-focus)'" onblur="this.style.borderColor='var(--border)'">
+            </div>
+            <button type="submit" class="btn btn-p" style="margin-top:4px">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              Enregistrer le mot de passe
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

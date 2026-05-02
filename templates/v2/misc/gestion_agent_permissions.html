@@ -1,0 +1,95 @@
+{% extends 'v2/base.html' %}
+{% block page_title %}Droits de {{ agent.username }} — ENSMG{% endblock %}
+{% block page_title_short %}Droits agent{% endblock %}
+{% block breadcrumb %}
+<a href="{% url 'frontend:dashboard' %}">Accueil</a><span class="bread-sep">›</span>
+<a href="{% url 'frontend:gestion_agents' %}">Agents</a><span class="bread-sep">›</span>
+<span class="bread-cur">{{ agent.username }}</span>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.perm-section { margin-bottom: 20px; }
+.perm-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: var(--t3); padding: 8px 0 6px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
+.perm-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 4px; border-bottom: 1px solid rgba(255,255,255,.03); }
+.perm-row:last-child { border-bottom: none; }
+.perm-label { font-size: 13px; color: var(--t1); }
+.toggle { position: relative; width: 36px; height: 20px; flex-shrink: 0; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-slider { position: absolute; inset: 0; background: var(--surface3); border-radius: 20px; cursor: pointer; transition: .2s; border: 1px solid var(--border); }
+.toggle-slider::before { content: ''; position: absolute; width: 14px; height: 14px; left: 2px; top: 2px; background: var(--t3); border-radius: 50%; transition: .2s; }
+.toggle input:checked + .toggle-slider { background: var(--accent-d); border-color: var(--accent); }
+.toggle input:checked + .toggle-slider::before { transform: translateX(16px); background: var(--accent); }
+.btn-row { display: flex; gap: 8px; margin-top: 16px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pi">
+  <div class="ph au">
+    <div class="ph-left">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--accent-d);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700">{{ agent.username|first|upper }}</div>
+        <div>
+          <div class="ph-title">{{ agent.username }}</div>
+          <div class="ph-sub">{{ agent.email|default:"Aucun email" }} · Agent simple</div>
+        </div>
+      </div>
+    </div>
+    <div class="ph-right">
+      <a href="{% url 'frontend:gestion_agents' %}" class="btn btn-o btn-sm">← Retour aux agents</a>
+    </div>
+  </div>
+
+  <div class="au d1">
+    <div class="card">
+      <div class="ch">
+        <div class="ch-ico b"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg></div>
+        <div>
+          <div class="ch-title">Configuration des droits d'accès</div>
+          <div class="ch-sub">Activez ou désactivez l'accès à chaque module</div>
+        </div>
+      </div>
+      <div class="cb">
+        <form method="POST">
+          {% csrf_token %}
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 32px">
+            {% for group_label, rows in perm_groups %}
+            <div class="perm-section">
+              <div class="perm-section-title">{{ group_label }}</div>
+              {% for key, label, value in rows %}
+              <div class="perm-row">
+                <span class="perm-label">{{ label }}</span>
+                <label class="toggle">
+                  <input type="checkbox" name="{{ key }}"{% if value %} checked{% endif %}>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              {% endfor %}
+            </div>
+            {% endfor %}
+          </div>
+
+          <div class="btn-row">
+            <button type="submit" class="btn btn-p">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              Enregistrer les droits
+            </button>
+            <button type="button" onclick="toggleAll(true)" class="btn btn-o btn-sm">Tout activer</button>
+            <button type="button" onclick="toggleAll(false)" class="btn btn-o btn-sm">Tout désactiver</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleAll(state) {
+  document.querySelectorAll('.toggle input[type=checkbox]').forEach(cb => cb.checked = state);
+}
+</script>
+{% endblock %}

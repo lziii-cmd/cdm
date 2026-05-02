@@ -1,0 +1,70 @@
+{% extends 'v2/base.html' %}
+{% block page_title %}Nouvel agent — ENSMG{% endblock %}
+{% block page_title_short %}Nouvel agent{% endblock %}
+{% block breadcrumb %}
+<a href="{% url 'frontend:dashboard' %}">Accueil</a><span class="bread-sep">›</span>
+<a href="{% url 'frontend:gestion_agents' %}">Agents</a><span class="bread-sep">›</span>
+<span class="bread-cur">Nouvel agent</span>
+{% endblock %}
+
+{% block content %}
+<div class="pi">
+  <div class="ph au">
+    <div class="ph-left"><div class="ph-title">Créer un agent simple</div><div class="ph-sub">Le compte sera immédiatement actif</div></div>
+    <div class="ph-right"><a href="{% url 'frontend:gestion_agents' %}" class="btn btn-o btn-sm">← Retour</a></div>
+  </div>
+
+  <div class="au d1" style="max-width:520px">
+    <div class="card">
+      <div class="ch">
+        <div class="ch-ico g"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg></div>
+        <div><div class="ch-title">Nouveau compte agent</div></div>
+      </div>
+      <div class="cb">
+        <form method="POST" action="{% url 'frontend:gestion_agent_create' %}">
+          {% csrf_token %}
+          <div style="display:flex;flex-direction:column;gap:14px">
+
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--t2)">Nom d'utilisateur *</label>
+              <input type="text" name="username" required placeholder="ex: moussa.diop"
+                style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rx);padding:9px 12px;font-size:13px;color:var(--t1);font-family:var(--font);outline:none;transition:border-color .14s"
+                onfocus="this.style.borderColor='var(--border-focus)'" onblur="this.style.borderColor='var(--border)'">
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--t2)">Email</label>
+              <input type="email" name="email" placeholder="ex: moussa@ensmg.sn"
+                style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rx);padding:9px 12px;font-size:13px;color:var(--t1);font-family:var(--font);outline:none;transition:border-color .14s"
+                onfocus="this.style.borderColor='var(--border-focus)'" onblur="this.style.borderColor='var(--border)'">
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--t2)">Mot de passe *</label>
+              <input type="password" name="password" required placeholder="Mot de passe"
+                style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rx);padding:9px 12px;font-size:13px;color:var(--t1);font-family:var(--font);outline:none;transition:border-color .14s"
+                onfocus="this.style.borderColor='var(--border-focus)'" onblur="this.style.borderColor='var(--border)'">
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--t2)">Confirmer le mot de passe *</label>
+              <input type="password" name="password2" required placeholder="Répéter le mot de passe"
+                style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rx);padding:9px 12px;font-size:13px;color:var(--t1);font-family:var(--font);outline:none;transition:border-color .14s"
+                onfocus="this.style.borderColor='var(--border-focus)'" onblur="this.style.borderColor='var(--border)'">
+            </div>
+
+            <div style="padding:10px 12px;background:var(--surface2);border-radius:var(--rs);border:1px solid var(--border);font-size:12px;color:var(--t2)">
+              Le compte sera créé avec les permissions par défaut. Vous pourrez les affiner après la création.
+            </div>
+
+            <button type="submit" class="btn btn-p" style="margin-top:4px">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              Créer le compte
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

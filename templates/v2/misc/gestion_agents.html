@@ -1,0 +1,93 @@
+{% extends 'v2/base.html' %}
+{% block page_title %}Gestion des agents — ENSMG{% endblock %}
+{% block page_title_short %}Agents{% endblock %}
+{% block breadcrumb %}
+<a href="{% url 'frontend:dashboard' %}">Accueil</a><span class="bread-sep">›</span><span class="bread-cur">Gestion des agents</span>
+{% endblock %}
+
+{% block content %}
+<div class="pi">
+  <div class="ph au">
+    <div class="ph-left">
+      <div class="ph-title">Gestion des agents</div>
+      <div class="ph-sub">Créer des comptes et configurer les droits d'accès</div>
+    </div>
+    <div class="ph-right">
+      <a href="{% url 'frontend:gestion_agent_create' %}" class="btn btn-p">
+        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Nouvel agent
+      </a>
+    </div>
+  </div>
+
+  <div class="au d1">
+    <div class="card">
+      <div class="ch">
+        <div class="ch-ico g"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
+        <div><div class="ch-title">Agents simples ({{ agents|length }})</div></div>
+      </div>
+      <div class="cb">
+        {% if agents %}
+        <table style="width:100%;border-collapse:collapse;font-size:13px">
+          <thead>
+            <tr>
+              <th style="padding:8px 10px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--t3);border-bottom:1px solid var(--border)">Utilisateur</th>
+              <th style="padding:8px 10px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--t3);border-bottom:1px solid var(--border)">Email</th>
+              <th style="padding:8px 10px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--t3);border-bottom:1px solid var(--border)">Statut</th>
+              <th style="padding:8px 10px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--t3);border-bottom:1px solid var(--border)">Permissions</th>
+              <th style="padding:8px 10px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--t3);border-bottom:1px solid var(--border)">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for agent in agents %}
+            <tr style="border-bottom:1px solid rgba(255,255,255,.03)">
+              <td style="padding:10px">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="width:28px;height:28px;border-radius:50%;background:var(--accent-d);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">{{ agent.username|first|upper }}</div>
+                  <div>
+                    <div style="color:var(--t1);font-weight:600">{{ agent.username }}</div>
+                    <div style="font-size:10px;color:var(--t3)">Agent simple</div>
+                  </div>
+                </div>
+              </td>
+              <td style="padding:10px;color:var(--t2)">{{ agent.email|default:"—" }}</td>
+              <td style="padding:10px">
+                {% if agent.is_active %}
+                <span style="background:var(--green-d);color:var(--green);padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700">Actif</span>
+                {% else %}
+                <span style="background:var(--red-d);color:var(--red);padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700">Inactif</span>
+                {% endif %}
+              </td>
+              <td style="padding:10px">
+                {% if perms_map|default:None %}
+                  {% with p=perms_map|default:None %}
+                    {% if agent.id in perms_map %}
+                    <span style="background:var(--accent-d);color:var(--accent);padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700">Configuré</span>
+                    {% else %}
+                    <span style="background:var(--amber-d);color:var(--amber);padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700">Par défaut</span>
+                    {% endif %}
+                  {% endwith %}
+                {% else %}
+                <span style="background:var(--amber-d);color:var(--amber);padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700">Par défaut</span>
+                {% endif %}
+              </td>
+              <td style="padding:10px">
+                <a href="{% url 'frontend:gestion_agent_permissions' pk=agent.pk %}" class="btn btn-o btn-sm">Configurer les droits</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div style="text-align:center;padding:40px;color:var(--t3)">
+          <div style="font-size:32px;margin-bottom:8px">👤</div>
+          <div style="font-size:14px;font-weight:600;color:var(--t2);margin-bottom:4px">Aucun agent simple</div>
+          <div style="font-size:12px">Créez un compte agent pour commencer.</div>
+          <a href="{% url 'frontend:gestion_agent_create' %}" class="btn btn-p" style="margin-top:16px;display:inline-flex">Créer un agent</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

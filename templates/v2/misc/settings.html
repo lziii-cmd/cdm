@@ -1,0 +1,286 @@
+{% extends 'v2/base.html' %}
+{% block page_title %}Paramètres — ENSMG{% endblock %}
+{% block page_title_short %}Paramètres{% endblock %}
+{% block breadcrumb %}
+<a href="{% url 'frontend:dashboard' %}">Accueil</a><span class="bread-sep">›</span><span class="bread-cur">Paramètres</span>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.settings-grid { display: grid; grid-template-columns: 220px 1fr; gap: 16px; align-items: start; }
+.settings-nav { display: flex; flex-direction: column; gap: 2px; }
+.sn-item { padding: 9px 12px; border-radius: var(--rx); font-size: 12px; font-weight: 500; color: var(--t2); cursor: pointer; transition: all .14s; display: flex; align-items: center; gap: 8px; }
+.sn-item:hover { background: var(--surface3); color: var(--t1); }
+.sn-item.on { background: var(--accent-d); color: var(--accent); }
+.sn-item svg { width: 13px; height: 13px; flex-shrink: 0; }
+.tab-panel { display: none; }
+.tab-panel.on { display: block; }
+.field { display: flex; flex-direction: column; gap: 4px; }
+.flbl { font-size: 11px; font-weight: 600; color: var(--t2); text-transform: uppercase; letter-spacing: .5px; }
+.fi { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--rx); padding: 8px 11px; font-size: 13px; color: var(--t1); font-family: var(--font); width: 100%; outline: none; transition: border-color .14s; }
+.fi:focus { border-color: var(--border-focus); }
+.fi[readonly] { opacity: .6; cursor: not-allowed; }
+.fgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.fgrid.full { grid-template-columns: 1fr; }
+.info-box { margin-top: 12px; padding: 12px; background: var(--surface2); border-radius: var(--rs); border: 1px solid var(--border); font-size: 12px; color: var(--t2); }
+.toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.toggle-row:last-child { border-bottom: none; }
+.toggle-label { font-size: 13px; color: var(--t1); font-weight: 500; }
+.toggle-sub { font-size: 11px; color: var(--t3); margin-top: 2px; }
+.toggle { position: relative; width: 36px; height: 20px; flex-shrink: 0; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-slider { position: absolute; inset: 0; background: var(--surface3); border-radius: 20px; cursor: pointer; transition: .2s; border: 1px solid var(--border); }
+.toggle-slider::before { content: ''; position: absolute; width: 14px; height: 14px; left: 2px; top: 2px; background: var(--t3); border-radius: 50%; transition: .2s; }
+.toggle input:checked + .toggle-slider { background: var(--accent-d); border-color: var(--accent); }
+.toggle input:checked + .toggle-slider::before { transform: translateX(16px); background: var(--accent); }
+.exo-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.exo-table th { padding: 8px 10px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: var(--t3); border-bottom: 1px solid var(--border); }
+.exo-table td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,.03); color: var(--t2); }
+.exo-table tr:hover td { background: var(--surface2); }
+.depot-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.depot-row:last-child { border-bottom: none; }
+.badge-g { background: var(--green-d); color: var(--green); padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; }
+.badge-r { background: var(--red-d); color: var(--red); padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; }
+.theme-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 4px; }
+.theme-opt { border: 2px solid var(--border); border-radius: var(--rs); padding: 12px; cursor: pointer; text-align: center; transition: all .14s; }
+.theme-opt:hover { border-color: var(--border-h); }
+.theme-opt.on { border-color: var(--accent); background: var(--accent-d); }
+.theme-opt-icon { font-size: 20px; margin-bottom: 4px; }
+.theme-opt-label { font-size: 11px; color: var(--t2); font-weight: 500; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pi">
+  <div class="ph au">
+    <div class="ph-left"><div class="ph-title">Paramètres</div><div class="ph-sub">Configuration du système ENSMG</div></div>
+  </div>
+
+  <div class="settings-grid au d1">
+    <!-- Nav latérale -->
+    <div class="card" style="padding:10px">
+      <div class="settings-nav">
+        <div class="sn-item on" data-tab="general">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>
+          Général
+        </div>
+        <div class="sn-item" data-tab="notifications">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+          Notifications
+        </div>
+        <div class="sn-item" data-tab="securite">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          Sécurité
+        </div>
+        {% if request.user.is_staff %}
+        <div class="sn-item" data-tab="exercice">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Exercice comptable
+        </div>
+        <div class="sn-item" data-tab="depots">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"/></svg>
+          Dépôts
+        </div>
+        {% endif %}
+        <div class="sn-item" data-tab="apparence">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          Apparence
+        </div>
+      </div>
+    </div>
+
+    <!-- Panneaux -->
+    <div class="card">
+
+      <!-- Général -->
+      <div class="tab-panel on" id="tab-general">
+        <div class="ch">
+          <div class="ch-ico b"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg></div>
+          <div><div class="ch-title">Paramètres généraux</div></div>
+        </div>
+        <div class="cb">
+          <div class="fgrid" style="gap:12px">
+            <div class="field"><div class="flbl">Nom de l'institution</div><input class="fi" value="École normale supérieure des mines et de la géologie" readonly></div>
+            <div class="field"><div class="flbl">Abréviation</div><input class="fi" value="ENSMG" readonly></div>
+            <div class="field"><div class="flbl">Devise</div><input class="fi" value="F CFA (XOF)" readonly></div>
+            <div class="field"><div class="flbl">Pays</div><input class="fi" value="Sénégal" readonly></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notifications -->
+      <div class="tab-panel" id="tab-notifications">
+        <div class="ch">
+          <div class="ch-ico a"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg></div>
+          <div><div class="ch-title">Préférences de notifications</div></div>
+        </div>
+        <div class="cb">
+          <div class="toggle-row">
+            <div><div class="toggle-label">Nouveaux achats</div><div class="toggle-sub">Notifier à chaque nouvel achat enregistré</div></div>
+            <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">Mouvements de stock</div><div class="toggle-sub">Entrées, sorties et transferts</div></div>
+            <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">Alertes stock bas</div><div class="toggle-sub">Quand une matière passe sous le seuil minimal</div></div>
+            <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">Validation de documents</div><div class="toggle-sub">PV, bons d'entrée générés</div></div>
+            <label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">Clôture d'exercice</div><div class="toggle-sub">Rappels avant la clôture annuelle</div></div>
+            <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sécurité -->
+      <div class="tab-panel" id="tab-securite">
+        <div class="ch">
+          <div class="ch-ico g"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg></div>
+          <div><div class="ch-title">Sécurité du compte</div></div>
+        </div>
+        <div class="cb">
+          <div class="fgrid full" style="gap:12px">
+            <div class="field"><div class="flbl">Identifiant</div><input class="fi" value="{{ request.user.username }}" readonly></div>
+            <div class="field"><div class="flbl">Email</div><input class="fi" value="{{ request.user.email }}" readonly></div>
+            <div class="field"><div class="flbl">Rôle</div>
+              <input class="fi" value="{% if is_superadmin %}Super Administrateur{% elif is_chef_service %}Chef de service{% else %}Agent simple{% endif %}" readonly>
+            </div>
+          </div>
+          <div class="info-box" style="margin-top:16px">
+            <div style="color:var(--t1);font-weight:600;margin-bottom:6px">Changer le mot de passe</div>
+            <div style="font-size:12px;color:var(--t2);margin-bottom:8px">Pour modifier votre mot de passe, rendez-vous sur votre page profil.</div>
+            <a href="{% url 'frontend:profil' %}" class="btn btn-o btn-sm" style="display:inline-flex">Mon profil →</a>
+          </div>
+          <div style="margin-top:12px;display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--surface2);border-radius:var(--rs);border:1px solid var(--border)">
+            <div>
+              <div style="font-size:13px;font-weight:600;color:var(--t1)">Dernière connexion</div>
+              <div style="font-size:12px;color:var(--t3);margin-top:2px">{{ request.user.last_login|date:"d/m/Y à H:i"|default:"—" }}</div>
+            </div>
+            <div style="font-size:20px">🔐</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Exercice comptable (admin seulement) -->
+      {% if request.user.is_staff %}
+      <div class="tab-panel" id="tab-exercice">
+        <div class="ch">
+          <div class="ch-ico a"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+          <div><div class="ch-title">Exercices comptables</div></div>
+        </div>
+        <div class="cb">
+          <table class="exo-table">
+            <thead><tr><th>Code</th><th>Début</th><th>Fin</th><th>Statut</th></tr></thead>
+            <tbody>
+              {% for ex in exercices_all %}
+              <tr>
+                <td style="color:var(--accent);font-family:var(--mono);font-weight:600">{{ ex.code }}</td>
+                <td>{{ ex.date_debut|date:"d/m/Y"|default:"—" }}</td>
+                <td>{{ ex.date_fin|date:"d/m/Y"|default:"—" }}</td>
+                <td>
+                  {% if ex.statut == 'OUVERT' %}
+                    <span class="badge-g">Ouvert</span>
+                  {% else %}
+                    <span class="badge-r">Clos</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="4" style="text-align:center;color:var(--t3);padding:20px">Aucun exercice</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          <div style="margin-top:12px">
+            <a href="{% url 'frontend:exercices' %}" class="btn btn-p btn-sm">Gérer les exercices</a>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Dépôts (admin seulement) -->
+      {% if request.user.is_staff %}
+      <div class="tab-panel" id="tab-depots">
+        <div class="ch">
+          <div class="ch-ico p"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"/></svg></div>
+          <div><div class="ch-title">Dépôts / Sites</div></div>
+        </div>
+        <div class="cb">
+          {% for depot in depots %}
+          <div class="depot-row">
+            <div>
+              <div style="font-size:13px;color:var(--t1);font-weight:500">{{ depot.libelle|default:depot.code }}</div>
+              <div style="font-size:11px;color:var(--t3);margin-top:2px;font-family:var(--mono)">{{ depot.code }}</div>
+            </div>
+            <span class="badge-g">Actif</span>
+          </div>
+          {% empty %}
+          <div style="text-align:center;color:var(--t3);padding:20px;font-size:13px">Aucun dépôt configuré</div>
+          {% endfor %}
+          <div style="margin-top:12px">
+            <a href="{% url 'frontend:depots' %}" class="btn btn-p btn-sm">Gérer les dépôts</a>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Apparence -->
+      <div class="tab-panel" id="tab-apparence">
+        <div class="ch">
+          <div class="ch-ico p"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div>
+          <div><div class="ch-title">Apparence</div></div>
+        </div>
+        <div class="cb">
+          <div class="field" style="margin-bottom:16px">
+            <div class="flbl" style="margin-bottom:8px">Thème</div>
+            <div class="theme-grid">
+              <div class="theme-opt on">
+                <div class="theme-opt-icon">🌙</div>
+                <div class="theme-opt-label">Sombre</div>
+              </div>
+              <div class="theme-opt">
+                <div class="theme-opt-icon">☀️</div>
+                <div class="theme-opt-label">Clair</div>
+              </div>
+              <div class="theme-opt">
+                <div class="theme-opt-icon">💻</div>
+                <div class="theme-opt-label">Système</div>
+              </div>
+            </div>
+          </div>
+          <div class="field">
+            <div class="flbl">Langue</div>
+            <select class="fi" style="cursor:pointer">
+              <option selected>Français</option>
+              <option>English</option>
+            </select>
+          </div>
+          <div class="info-box" style="margin-top:16px">
+            Les préférences d'apparence sont sauvegardées localement dans votre navigateur.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.querySelectorAll('.sn-item').forEach(item => {
+  item.addEventListener('click', () => {
+    const tab = item.dataset.tab;
+    document.querySelectorAll('.sn-item').forEach(i => i.classList.remove('on'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('on'));
+    item.classList.add('on');
+    document.getElementById('tab-' + tab).classList.add('on');
+  });
+});
+</script>
+{% endblock %}
